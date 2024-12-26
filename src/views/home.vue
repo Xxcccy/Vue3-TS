@@ -1,5 +1,7 @@
 <template>
-  <el-button plain @click="open">Open dialog form</el-button>
+  <div class="w-96">
+    <el-button class="ml-10 mt-3" plain @click="open">Open dialog form</el-button>
+  </div>
 
   <Dialog :visible="dialogVisible" @confirm="confirm" @cancel="cancel">
     <template #content>
