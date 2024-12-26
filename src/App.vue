@@ -1,9 +1,7 @@
 <template>
-  <Form>
-    Open dialog form
-  </Form>
+  <Home />
 </template>
 
 <script setup lang="ts">
-import Form from './views/form.vue';
+import Home from './views/home.vue';
 </script>

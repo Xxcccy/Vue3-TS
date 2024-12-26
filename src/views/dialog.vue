@@ -24,13 +24,13 @@ watch(() => visible, (newValue: boolean) => dialogVisible.value = newValue);
 
 const emit = defineEmits<{
   (e: 'cancel', visible: boolean): void,
-  (e: 'submit', visible: boolean): void,
+  (e: 'confirm', visible: boolean): void,
 }>();
 
 const dialogVisible = ref(false);
 
 const submit = async () => {
-  emit('submit', false);
+  emit('confirm', false);
 }
 const onSubmit = throttle(submit, 1500);
 
