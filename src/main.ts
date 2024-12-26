@@ -2,5 +2,9 @@ import 'element-plus/dist/index.css'
 
 import { createApp } from 'vue'
 import App from './App.vue'
+import { msgSuccess } from './utils/Message'
 
-createApp(App).mount('#app')
+const app = createApp(App);
+// 全局message函数
+app.config.globalProperties.$msgSuccess = msgSuccess;
+app.mount('#app');

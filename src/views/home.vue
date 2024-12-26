@@ -9,10 +9,11 @@
 </template>
 
 <script setup lang="ts">
-import { ElMessage } from 'element-plus';
-import { ref } from 'vue';
+import { getCurrentInstance, ref } from 'vue';
 import Dialog from './dialog.vue';
 import Form from './form.vue';
+
+const { proxy }: any = getCurrentInstance();
 
 const dialogVisible = ref(false);
 const loading = ref(false);
@@ -24,12 +25,7 @@ const confirm = (visible: boolean) => {
   setTimeout(() => {
     dialogVisible.value = visible;
     loading.value = false;
-    ElMessage({
-      message: 'Confirm!!!',
-      type: 'success',
-      plain: true,
-      duration: 1000,
-    })
+    proxy.$msgSuccess('Confirm!!!')
   }, 500);
 }
 
