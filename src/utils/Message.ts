@@ -4,7 +4,6 @@ function msgSuccess(message: string): void {
   ElMessage({
     message,
     type: 'success',
-    plain: true,
     duration: 1000,
   })
 }

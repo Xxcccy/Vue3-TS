@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="dialogVisible" title="Tips" width="500">
+  <el-dialog v-model="dialogVisible" title="Tips" width="500" :before-close="cancel">
     <slot name="content"></slot>
 
     <template #footer>
