@@ -1,17 +1,17 @@
 <template>
-  <el-form :model="form" label-width="auto" style="max-width: 600px" v-loading="loading">
-    <el-form-item label="Activity name">
+  <el-form ref="formRef" :model="form" label-width="auto" style="max-width: 600px" v-loading="loading">
+    <el-form-item label="Activity name" prop="name">
       <el-input v-model="form.name" />
     </el-form-item>
 
-    <el-form-item label="Activity zone">
+    <el-form-item label="Activity zone" prop="region">
       <el-select v-model="form.region" placeholder="please select your zone">
         <el-option label="Zone one" value="shanghai" />
         <el-option label="Zone two" value="beijing" />
       </el-select>
     </el-form-item>
 
-    <el-form-item label="Activity time">
+    <el-form-item label="Activity time" prop="date1">
       <el-col :span="11">
         <el-date-picker v-model="form.date1" type="date" placeholder="Pick a date" style="width: 100%" />
       </el-col>
@@ -23,11 +23,11 @@
       </el-col>
     </el-form-item>
 
-    <el-form-item label="Instant delivery">
+    <el-form-item label="Instant delivery" prop="delivery">
       <el-switch v-model="form.delivery" />
     </el-form-item>
 
-    <el-form-item label="Activity type">
+    <el-form-item label="Activity type" prop="type">
       <el-checkbox-group v-model="form.type">
         <el-checkbox value="Online activities" name="type">
           Online activities
@@ -44,25 +44,36 @@
       </el-checkbox-group>
     </el-form-item>
 
-    <el-form-item label="Resources">
+    <el-form-item label="Resources" prop="resource">
       <el-radio-group v-model="form.resource">
         <el-radio value="Sponsor">Sponsor</el-radio>
         <el-radio value="Venue">Venue</el-radio>
       </el-radio-group>
     </el-form-item>
 
-    <el-form-item label="Activity form">
+    <el-form-item label="Activity form" prop="desc">
       <el-input v-model="form.desc" type="textarea" />
     </el-form-item>
   </el-form>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, useTemplateRef, watch } from 'vue';
 
 const { loading } = defineProps<{
   loading: boolean
 }>();
+
+const formRef = useTemplateRef('formRef');
+watch(
+  () => loading,
+  (newValue) => {
+    if (!newValue) {
+      formRef.value?.resetFields();
+      form.date2 = '';
+    }
+  }
+)
 
 const form = reactive({
   name: '',
