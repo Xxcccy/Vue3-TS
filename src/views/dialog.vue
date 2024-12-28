@@ -1,7 +1,7 @@
 <template>
-  <el-dialog v-model="dialogVisible" title="Tips" width="500" :before-close="cancel">
+  <el-dialog v-model="dialogVisible" title="Tips" width="500" :before-close="cancel" :close-on-click-modal="false">
+    <template #header>New Form</template>
     <slot name="content"></slot>
-
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="cancel">Cancel</el-button>
@@ -20,6 +20,7 @@ import { ref, watch } from 'vue';
 const { visible } = defineProps<{
   visible: boolean
 }>();
+
 watch(() => visible, (newValue: boolean) => dialogVisible.value = newValue);
 
 const emit = defineEmits<{
@@ -29,12 +30,8 @@ const emit = defineEmits<{
 
 const dialogVisible = ref(false);
 
-const submit = async () => {
-  emit('confirm', false);
-}
+const submit = () => emit('confirm', false);
 const onSubmit = throttle(submit, 1500);
 
-const cancel = () => {
-  emit('cancel', false);
-}
+const cancel = () => emit('cancel', false);
 </script>

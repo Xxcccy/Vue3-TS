@@ -11,18 +11,6 @@
       </el-select>
     </el-form-item>
 
-    <el-form-item label="Activity time" prop="date1">
-      <el-col :span="11">
-        <el-date-picker v-model="form.date1" type="date" placeholder="Pick a date" style="width: 100%" />
-      </el-col>
-      <el-col :span="2" class="text-center">
-        <span class="text-gray-500">-</span>
-      </el-col>
-      <el-col :span="11">
-        <el-time-picker v-model="form.date2" placeholder="Pick a time" style="width: 100%" />
-      </el-col>
-    </el-form-item>
-
     <el-form-item label="Instant delivery" prop="delivery">
       <el-switch v-model="form.delivery" />
     </el-form-item>
@@ -54,23 +42,31 @@
     <el-form-item label="Activity form" prop="desc">
       <el-input v-model="form.desc" type="textarea" />
     </el-form-item>
+
+    <FileUpload :reset="uploadReset" />
   </el-form>
 </template>
 
 <script setup lang="ts">
-import { reactive, useTemplateRef, watch } from 'vue';
+import { reactive, ref, useTemplateRef, watch } from 'vue';
+import FileUpload from '@/components/FileUpload.vue';
 
 const { loading } = defineProps<{
   loading: boolean
 }>();
 
+// const formRef = ref(null)  3.5之前的获取模板引用的用法
+// useTemplateRef() => vue3.5+ 新特性
 const formRef = useTemplateRef('formRef');
+const uploadReset = ref(false);
+
 watch(
   () => loading,
   (newValue) => {
     if (!newValue) {
+      // resetFields()生效的前提是el-form-item的prop属性有值
       formRef.value?.resetFields();
-      form.date2 = '';
+      uploadReset.value = true;
     }
   }
 )
@@ -78,8 +74,6 @@ watch(
 const form = reactive({
   name: '',
   region: '',
-  date1: '',
-  date2: '',
   delivery: false,
   type: [],
   resource: '',
