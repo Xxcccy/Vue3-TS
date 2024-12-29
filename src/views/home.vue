@@ -6,9 +6,9 @@
 
   <!-- Origin Dialog -->
   <Dialog
+    width="500"
     :visible="originDialogVisble"
     :title="originDialogTitle"
-    width="500"
     @confirm="confirmOrigin"
     @cancel="cancelOrigin"
   >
@@ -17,9 +17,9 @@
 
   <!-- Form Dialog -->
   <Dialog
+    width="1000"
     :visible="formDialogVisible"
     :title="formDialogTitle"
-    width="1000"
     @confirm="confirmForm"
     @cancel="cancelForm"
   >
