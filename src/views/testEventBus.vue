@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { eventBus } from '@/utils/EventBus';
+import { eventBus } from "@/utils/EventBus";
 
-const addCount = () => eventBus.emit('addCount', 1);
+const addCount = () => eventBus.emit("addCount", 1);
 </script>
