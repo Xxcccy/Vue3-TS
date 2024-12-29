@@ -116,15 +116,6 @@ const formLoading = ref(false);
 const defaultFileList = ref([]);
 const disabled = ref(false);
 
-const getCurrentFileList = (fileList: UploadUserFile[]) => {
-  form.fileList = fileList;
-};
-
-const resetForm = () => {
-  defaultFileList.value = [];
-  formRef.value?.resetFields();
-};
-
 const openForm = () => {
   formDialogVisible.value = true;
   formLoading.value = false;
@@ -143,6 +134,12 @@ const confirmForm = async (visible: boolean) => {
 const cancelForm = (visible: boolean) => {
   formDialogVisible.value = visible;
   resetForm();
+};
+
+const getCurrentFileList = (fileList: UploadUserFile[]) => (form.fileList = fileList);
+const resetForm = () => {
+  defaultFileList.value = [];
+  formRef.value?.resetFields();
 };
 
 const openOrigin = () => (originDialogVisble.value = true);

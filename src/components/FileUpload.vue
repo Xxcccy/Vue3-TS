@@ -14,11 +14,7 @@
 
       <template #file="{ file, index }">
         <div>
-          <img
-            class="el-upload-list__item-thumbnail avatar"
-            :src="file.url"
-            alt=""
-          />
+          <img class="el-upload-list__item-thumbnail avatar" :src="file.url" alt="" />
           <span class="el-upload-list__item-actions">
             <span
               class="el-upload-list__item-preview"
@@ -44,9 +40,7 @@
         </div>
       </template>
       <template #tip>
-        <div class="el-upload__tip">
-          jpg/png files with a size less than 500kb
-        </div>
+        <div class="el-upload__tip">jpg/png files with a size less than 500kb</div>
       </template>
     </el-upload>
 
@@ -109,8 +103,7 @@ const handleUpload: UploadRequestHandler = (option: UploadRequestOptions) => {
       //属性 lengthComputable 主要表明总共需要完成的工作量和已经完成的工作是否可以被测量
       // progressEvent.loaded：上传进度
       // progressEvent.total：总大小
-      upLoadProgress.value =
-        Math.floor(progressEvent.loaded / progressEvent.total) * 100; //实时获取上传进度
+      upLoadProgress.value = Math.floor(progressEvent.loaded / progressEvent.total) * 100; //实时获取上传进度
     }
   };
   return api.upload(formData, { onUploadProgress });
