@@ -10,35 +10,122 @@
 
   <Dialog :visible="dialogVisible" @confirm="confirm" @cancel="cancel">
     <template #content>
-      <Form :loading="loading"></Form>
+      <el-form ref="formRef" :model="form" label-width="auto" style="max-width: 600px" v-loading="loading">
+        <el-form-item label="Activity name" prop="name">
+          <el-input v-model="form.name" />
+        </el-form-item>
+
+        <el-form-item label="Activity zone" prop="region">
+          <el-select v-model="form.region" placeholder="please select your zone">
+            <el-option label="Zone one" value="shanghai" />
+            <el-option label="Zone two" value="beijing" />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="Instant delivery" prop="delivery">
+          <el-switch v-model="form.delivery" />
+        </el-form-item>
+
+        <el-form-item label="Activity type" prop="type">
+          <el-checkbox-group v-model="form.type">
+            <el-checkbox value="Online activities" name="type">
+              Online activities
+            </el-checkbox>
+            <el-checkbox value="Promotion activities" name="type">
+              Promotion activities
+            </el-checkbox>
+            <el-checkbox value="Offline activities" name="type">
+              Offline activities
+            </el-checkbox>
+            <el-checkbox value="Simple brand exposure" name="type">
+              Simple brand exposure
+            </el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+
+        <el-form-item label="Resources" prop="resource">
+          <el-radio-group v-model="form.resource">
+            <el-radio value="Sponsor">Sponsor</el-radio>
+            <el-radio value="Venue">Venue</el-radio>
+          </el-radio-group>
+        </el-form-item>
+
+        <el-form-item label="Activity form" prop="desc">
+          <el-input v-model="form.desc" type="textarea" />
+        </el-form-item>
+
+        <FileUpload :default-file-list="defaultFileList" @update-file-list="getCurrentFileList" />
+      </el-form>
     </template>
   </Dialog>
 </template>
 
 <script setup lang="ts">
-import { getCurrentInstance, ref } from 'vue';
-import Dialog from './dialog.vue';
-import Form from './form.vue';
+import FileUpload from '@/components/FileUpload.vue';
 import { eventBus } from '@/utils/EventBus';
+import { getCurrentInstance, reactive, ref, useTemplateRef } from 'vue';
+import Dialog from './dialog.vue';
+import api from '@/api/api';
+import type { UploadUserFile } from 'element-plus';
+
+interface infoForm {
+  name: string,
+  region: string,
+  delivery: boolean,
+  type: string[],
+  resource: string,
+  desc: string,
+  fileList: UploadUserFile[],
+}
 
 const count = ref(0);
 const { proxy }: any = getCurrentInstance();
+const form = reactive<infoForm>({
+  name: '',
+  region: '',
+  delivery: false,
+  type: [],
+  resource: '',
+  desc: '',
+  fileList: []
+});
+
+// const formRef = ref()  3.5之前的获取模板引用的用法
+// useTemplateRef() => vue3.5+ 新特性
+const formRef = useTemplateRef('formRef');
 
 const dialogVisible = ref(false);
 const loading = ref(false);
+const defaultFileList = ref([]);
 
-const open = () => dialogVisible.value = true;
+const getCurrentFileList = (fileList: UploadUserFile[]) => {
+  form.fileList = fileList;
+}
+
+const resetForm = () => {
+  defaultFileList.value = [];
+  formRef.value?.resetFields();
+}
+
+const open = () => {
+  dialogVisible.value = true;
+  loading.value = false;
+}
 
 const confirm = (visible: boolean) => {
   loading.value = true;
-  setTimeout(() => {
+  api.submit(form).then(res => {
     dialogVisible.value = visible;
     loading.value = false;
-    proxy.$msgSuccess('Confirm!!!');
-  }, 500);
+    resetForm();
+    proxy.$msgSuccess('Submit!!!');
+  })
 }
 
-const cancel = (visible: boolean) => dialogVisible.value = visible;
+const cancel = async (visible: boolean) => {
+  resetForm();
+  dialogVisible.value = visible;
+}
 
 eventBus.on('addCount', (value: number) => count.value += value);
 </script>

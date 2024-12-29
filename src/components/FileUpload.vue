@@ -1,44 +1,120 @@
 <template>
   <div>
-    <el-upload class="avatar-uploader" action="http://localhost:3000/upload" :show-file-list="false"
-      :before-upload="beforeUpload" :on-success="handleSuccess">
-      <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-      <el-icon v-else class="avatar-uploader-icon">
+    <el-upload v-model:file-list="fileList" class="upload" action="#" :http-request="handleUpload"
+      :before-upload="beforeUpload" :on-success="handleSuccess" list-type="picture-card">
+      <el-icon>
         <Plus />
       </el-icon>
+
+      <template #file="{ file, index }">
+        <div>
+          <img class="el-upload-list__item-thumbnail avatar" :src="file.url" alt="" />
+          <span class="el-upload-list__item-actions">
+            <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(file)">
+              <el-icon><zoom-in /></el-icon>
+            </span>
+            <span v-if="!disabled" class="el-upload-list__item-delete" @click="handleDownload(file)">
+              <el-icon>
+                <Download />
+              </el-icon>
+            </span>
+            <span v-if="!disabled" class="el-upload-list__item-delete" @click="handleRemove(file, index)">
+              <el-icon>
+                <Delete />
+              </el-icon>
+            </span>
+          </span>
+        </div>
+      </template>
     </el-upload>
+
+    <el-dialog v-model="dialogVisible">
+      <img w-full :src="dialogImageUrl" alt="Preview Image" />
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Plus } from '@element-plus/icons-vue';
-import type { UploadProps } from 'element-plus';
-import { ref, watch } from 'vue';
+import api from '@/api/api';
+import { Delete, Download, Plus, ZoomIn } from '@element-plus/icons-vue';
+import type {
+  UploadFile,
+  UploadProgressEvent,
+  UploadProps,
+  UploadRequestHandler,
+  UploadRequestOptions
+} from 'element-plus';
+import { onMounted, ref, watch } from 'vue';
 
-const { reset } = defineProps<{
-  reset: boolean
+const { defaultFileList } = defineProps<{
+  defaultFileList?: UploadFile[],
 }>();
-// 重置上传组件
+const emit = defineEmits<{
+  (e: 'updateFileList', fileList: UploadFile[]): void,
+}>();
+
+const upLoadProgress = ref(0);
+const dialogImageUrl = ref('');
+const dialogVisible = ref(false);
+const disabled = ref(false);
+const fileList = ref<UploadFile[]>([]);
+
+onMounted(() => {
+  if (defaultFileList?.length) fileList.value = defaultFileList;
+})
+
 watch(
-  () => reset,
-  (newValue) => {
-    if (newValue) imageUrl.value = '';
+  () => defaultFileList,
+  (newValue) => fileList.value = newValue ?? []
+);
+
+// 自定义上传
+const handleUpload: UploadRequestHandler = (option: UploadRequestOptions) => {
+  const formData = new FormData();
+  // formData.append(name, value, filename);
+  /**
+   * filename: 传给服务器的文件名称
+   */
+  formData.append(option.filename, option.file, option.file.name);
+
+  const onUploadProgress = (progressEvent: UploadProgressEvent) => {
+    if (progressEvent.lengthComputable) {
+      //属性 lengthComputable 主要表明总共需要完成的工作量和已经完成的工作是否可以被测量
+      // progressEvent.loaded：上传进度
+      // progressEvent.total：总大小
+      upLoadProgress.value = Math.floor(progressEvent.loaded / progressEvent.total) * 100; //实时获取上传进度
+    }
   }
-)
-
-const imageUrl = ref('');
-
-const handleSuccess: UploadProps['onSuccess'] = (response, uploadFile) => {
-  imageUrl.value = URL.createObjectURL(uploadFile.raw!);
+  return api.upload(formData, { onUploadProgress });
 }
 
-const beforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
-  console.log(rawFile);
+const handleSuccess: UploadProps['onSuccess'] = (response, uploadFile) => {
+  console.log('handleSuccess: ', uploadFile);
+  emit('updateFileList', fileList.value);
+}
+
+const beforeUpload: UploadProps['beforeUpload'] = (uploadFile) => {
+  // console.log('beforeUpload: ', uploadFile);
+}
+
+const handleRemove = (file: UploadFile, index: number) => {
+  console.log('remove: ', file);
+  fileList.value.splice(index, 1);
+  emit('updateFileList', fileList.value);
+}
+
+const handlePictureCardPreview = (file: UploadFile) => {
+  dialogImageUrl.value = file.url!;
+  dialogVisible.value = true;
+}
+
+const handleDownload = (file: UploadFile) => {
+  console.log(file);
 }
 </script>
 
 <style scoped>
-.avatar-uploader .avatar {
+.upload .avatar {
   width: 178px;
   height: 178px;
   display: block;
@@ -46,7 +122,7 @@ const beforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
 </style>
 
 <style>
-.avatar-uploader .el-upload {
+.upload .el-upload {
   border: 1px dashed var(--el-border-color);
   border-radius: 6px;
   cursor: pointer;
@@ -55,7 +131,7 @@ const beforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
   transition: var(--el-transition-duration-fast);
 }
 
-.avatar-uploader .el-upload:hover {
+.upload .el-upload:hover {
   border-color: var(--el-color-primary);
 }
 
