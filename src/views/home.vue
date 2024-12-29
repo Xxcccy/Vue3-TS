@@ -1,14 +1,27 @@
 <template>
   <div class="w-38">
-    <el-button type="primary" @click="open">Open Dialog</el-button>
+    <el-button type="primary" @click="openOrigin">Open Origin Dialog</el-button>
+    <el-button type="primary" @click="openForm">Open Form Dialog</el-button>
   </div>
 
+  <!-- Origin Dialog -->
   <Dialog
-    :visible="dialogVisible"
-    :title="dialogTitle"
+    :visible="originDialogVisble"
+    :title="originDialogTitle"
+    width="500"
+    @confirm="confirmOrigin"
+    @cancel="cancelOrigin"
+  >
+    <template #content>原始对话框</template>
+  </Dialog>
+
+  <!-- Form Dialog -->
+  <Dialog
+    :visible="formDialogVisible"
+    :title="formDialogTitle"
     width="1000"
-    @confirm="confirm"
-    @cancel="cancel"
+    @confirm="confirmForm"
+    @cancel="cancelForm"
   >
     <template #content>
       <el-form
@@ -23,10 +36,7 @@
         </el-form-item>
 
         <el-form-item label="Activity zone" prop="region">
-          <el-select
-            v-model="form.region"
-            placeholder="please select your zone"
-          >
+          <el-select v-model="form.region" placeholder="please select your zone">
             <el-option label="Zone one" value="shanghai" />
             <el-option label="Zone two" value="beijing" />
           </el-select>
@@ -81,15 +91,8 @@ import Dialog from '@/components/Dialog.vue';
 import FileUpload from '@/components/FileUpload.vue';
 import type { InfoForm } from '@/types';
 import type { UploadUserFile } from 'element-plus';
-import {
-  getCurrentInstance,
-  nextTick,
-  reactive,
-  ref,
-  useTemplateRef,
-} from 'vue';
+import { getCurrentInstance, nextTick, reactive, ref, useTemplateRef } from 'vue';
 
-const dialogTitle = ref('表单组件');
 const { proxy }: any = getCurrentInstance();
 const form = reactive<InfoForm>({
   name: '',
@@ -101,11 +104,14 @@ const form = reactive<InfoForm>({
   fileList: [],
 });
 
+const originDialogTitle = ref('原始对话框');
+const originDialogVisble = ref(false);
+
 // const formRef = ref()  3.5之前的获取模板引用的用法
 // useTemplateRef() => vue3.5+ 新特性
 const formRef = useTemplateRef('formRef');
-
-const dialogVisible = ref(false);
+const formDialogTitle = ref('表单组件');
+const formDialogVisible = ref(false);
 const formLoading = ref(false);
 const defaultFileList = ref([]);
 const disabled = ref(false);
@@ -119,23 +125,27 @@ const resetForm = () => {
   formRef.value?.resetFields();
 };
 
-const open = () => {
-  dialogVisible.value = true;
+const openForm = () => {
+  formDialogVisible.value = true;
   formLoading.value = false;
 };
 
-const confirm = async (visible: boolean) => {
+const confirmForm = async (visible: boolean) => {
   formLoading.value = true;
   await api.submit(form).then(res => {
-    dialogVisible.value = visible;
+    formDialogVisible.value = visible;
     formLoading.value = false;
     proxy.$msgSuccess('Submit!!!');
   });
   resetForm();
 };
 
-const cancel = (visible: boolean) => {
-  dialogVisible.value = visible;
+const cancelForm = (visible: boolean) => {
+  formDialogVisible.value = visible;
   resetForm();
 };
+
+const openOrigin = () => (originDialogVisble.value = true);
+const confirmOrigin = (visible: boolean) => (originDialogVisble.value = visible);
+const cancelOrigin = (visible: boolean) => (originDialogVisble.value = visible);
 </script>
