@@ -1,21 +1,22 @@
 <template>
   <div class="w-38">
-    <div>
-      <el-button type="primary">count: {{ count }}</el-button>
-    </div>
-    <div class="mt-2">
-      <el-button type="primary" @click="open">Open dialog form</el-button>
-    </div>
+    <el-button type="primary" @click="open">Open Dialog</el-button>
   </div>
 
-  <Dialog :visible="dialogVisible" @confirm="confirm" @cancel="cancel">
+  <Dialog
+    :visible="dialogVisible"
+    :title="dialogTitle"
+    width="1000"
+    @confirm="confirm"
+    @cancel="cancel"
+  >
     <template #content>
       <el-form
         ref="formRef"
         :model="form"
         label-width="auto"
-        style="max-width: 600px"
-        v-loading="loading"
+        style="width: 100%"
+        v-loading="formLoading"
       >
         <el-form-item label="Activity name" prop="name">
           <el-input v-model="form.name" />
@@ -63,11 +64,11 @@
           <el-input v-model="form.desc" type="textarea" />
         </el-form-item>
 
-        <el-divider content-position="center">文件上传</el-divider>
+        <el-divider content-position="center">文件上传组件</el-divider>
         <FileUpload
           :default-file-list="defaultFileList"
-          @change="getCurrentFileList"
           :disabled="disabled"
+          @change="getCurrentFileList"
         />
       </el-form>
     </template>
@@ -75,32 +76,37 @@
 </template>
 
 <script setup lang="ts">
-import api from "@/api/api";
-import FileUpload from "@/components/FileUpload.vue";
-import type { infoForm } from "@/types";
-import { eventBus } from "@/utils/EventBus";
-import type { UploadUserFile } from "element-plus";
-import { getCurrentInstance, reactive, ref, useTemplateRef } from "vue";
-import Dialog from "./dialog.vue";
+import api from '@/api/api';
+import Dialog from '@/components/Dialog.vue';
+import FileUpload from '@/components/FileUpload.vue';
+import type { InfoForm } from '@/types';
+import type { UploadUserFile } from 'element-plus';
+import {
+  getCurrentInstance,
+  nextTick,
+  reactive,
+  ref,
+  useTemplateRef,
+} from 'vue';
 
-const count = ref(0);
+const dialogTitle = ref('表单组件');
 const { proxy }: any = getCurrentInstance();
-const form = reactive<infoForm>({
-  name: "",
-  region: "",
+const form = reactive<InfoForm>({
+  name: '',
+  region: '',
   delivery: false,
   type: [],
-  resource: "",
-  desc: "",
+  resource: '',
+  desc: '',
   fileList: [],
 });
 
 // const formRef = ref()  3.5之前的获取模板引用的用法
 // useTemplateRef() => vue3.5+ 新特性
-const formRef = useTemplateRef("formRef");
+const formRef = useTemplateRef('formRef');
 
 const dialogVisible = ref(false);
-const loading = ref(false);
+const formLoading = ref(false);
 const defaultFileList = ref([]);
 const disabled = ref(false);
 
@@ -115,23 +121,21 @@ const resetForm = () => {
 
 const open = () => {
   dialogVisible.value = true;
-  loading.value = false;
+  formLoading.value = false;
 };
 
-const confirm = (visible: boolean) => {
-  loading.value = true;
-  api.submit(form).then((res) => {
+const confirm = async (visible: boolean) => {
+  formLoading.value = true;
+  await api.submit(form).then(res => {
     dialogVisible.value = visible;
-    loading.value = false;
-    resetForm();
-    proxy.$msgSuccess("Submit!!!");
+    formLoading.value = false;
+    proxy.$msgSuccess('Submit!!!');
   });
-};
-
-const cancel = async (visible: boolean) => {
   resetForm();
-  dialogVisible.value = visible;
 };
 
-eventBus.on("addCount", (value: number) => (count.value += value));
+const cancel = (visible: boolean) => {
+  dialogVisible.value = visible;
+  resetForm();
+};
 </script>

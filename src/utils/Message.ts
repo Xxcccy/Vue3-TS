@@ -1,11 +1,11 @@
-import { ElMessage } from "element-plus";
+import { ElMessage } from 'element-plus';
 
 function msgSuccess(message: string): void {
   ElMessage({
     message,
     type: 'success',
-    duration: 1000,
-  })
+    duration: 1500,
+  });
 }
 
-export { msgSuccess }
+export { msgSuccess };

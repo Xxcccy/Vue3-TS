@@ -4,10 +4,10 @@
       v-model:file-list="fileList"
       class="upload"
       action="#"
+      list-type="picture-card"
       :http-request="handleUpload"
       :before-upload="beforeUpload"
       :on-success="handleSuccess"
-      list-type="picture-card"
       :disabled="disabled"
     >
       <el-icon><Plus /></el-icon>
@@ -57,8 +57,9 @@
 </template>
 
 <script setup lang="ts">
-import api from "@/api/api";
-import { Delete, Download, Plus, ZoomIn } from "@element-plus/icons-vue";
+import api from '@/api/api';
+import type { FileUploadProps } from '@/types';
+import { Delete, Download, Plus, ZoomIn } from '@element-plus/icons-vue';
 import {
   ElMessage,
   type UploadFile,
@@ -66,29 +67,32 @@ import {
   type UploadProps,
   type UploadRequestHandler,
   type UploadRequestOptions,
-} from "element-plus";
-import { onMounted, ref, watch } from "vue";
+} from 'element-plus';
+import { onMounted, ref, watch } from 'vue';
 
-const { defaultFileList, disabled } = defineProps<{
-  defaultFileList?: UploadFile[];
-  disabled?: boolean;
-}>();
+// 请注意，在使用 withDefaults 时，默认值为可变引用类型 (如数组或对象) 应该封装在函数中，
+// 以避免意外修改和外部副作用。这样可以确保每个组件实例都获得默认值的自己的副本。
+// 在使用默认值解构时，这不是必要的。
+const props = withDefaults(defineProps<FileUploadProps>(), {
+  defaultFileList: () => [],
+  disabled: false,
+});
 const emit = defineEmits<{
-  (e: "change", fileList: UploadFile[]): void;
+  (e: 'change', fileList: UploadFile[]): void;
 }>();
 
 const upLoadProgress = ref(0);
-const dialogImageUrl = ref("");
+const dialogImageUrl = ref('');
 const dialogVisible = ref(false);
 const fileList = ref<UploadFile[]>([]);
 
 onMounted(() => {
-  if (defaultFileList?.length) fileList.value = defaultFileList;
+  if (props.defaultFileList?.length) fileList.value = props.defaultFileList;
 });
 
 watch(
-  () => defaultFileList,
-  (newValue) => (fileList.value = newValue ?? []),
+  () => props.defaultFileList,
+  newValue => (fileList.value = newValue ?? []),
 );
 
 // 自定义上传
@@ -112,28 +116,28 @@ const handleUpload: UploadRequestHandler = (option: UploadRequestOptions) => {
   return api.upload(formData, { onUploadProgress });
 };
 
-const handleSuccess: UploadProps["onSuccess"] = (response, uploadFile) => {
-  console.log("handleSuccess: ", uploadFile);
+const handleSuccess: UploadProps['onSuccess'] = (response, uploadFile) => {
+  console.log('handleSuccess: ', uploadFile);
   // 回传父组件最新的文件列表
-  emit("change", fileList.value);
+  emit('change', fileList.value);
 };
 
-const beforeUpload: UploadProps["beforeUpload"] = (uploadFile) => {
-  console.log("beforeUpload: ", uploadFile);
-  if (uploadFile.type !== "image/jpeg") {
-    ElMessage.error("Avatar picture must be JPG format!");
+const beforeUpload: UploadProps['beforeUpload'] = uploadFile => {
+  console.log('beforeUpload: ', uploadFile);
+  if (uploadFile.type !== 'image/jpeg') {
+    ElMessage.error('请选择JPG格式文件');
     return false;
-  } else if (uploadFile.size / 1024 / 1024 > 2) {
-    ElMessage.error("Avatar picture size can not exceed 2MB!");
+  } else if (uploadFile.size / 1024 > 500) {
+    ElMessage.error('图片文件大小不可超过500kb');
     return false;
   }
   return true;
 };
 
 const handleRemove = (file: UploadFile, index: number) => {
-  console.log("remove: ", file);
   fileList.value.splice(index, 1);
-  emit("change", fileList.value);
+  emit('change', fileList.value);
+  console.log('remove: ', file);
 };
 
 const handlePictureCardPreview = (file: UploadFile) => {
@@ -142,7 +146,7 @@ const handlePictureCardPreview = (file: UploadFile) => {
 };
 
 const handleDownload = (file: UploadFile) => {
-  console.log(file);
+  console.log('download: ', file);
 };
 </script>
 

@@ -1,10 +1,10 @@
-import { fileURLToPath, URL } from "node:url";
+import { fileURLToPath, URL } from 'node:url';
 
-import { defineConfig, loadEnv } from "vite";
-import AutoImport from "unplugin-auto-import/vite";
-import Components from "unplugin-vue-components/vite";
-import { ElementPlusResolver } from "unplugin-vue-components/resolvers";
-import vue from "@vitejs/plugin-vue";
+import { defineConfig, loadEnv } from 'vite';
+import AutoImport from 'unplugin-auto-import/vite';
+import Components from 'unplugin-vue-components/vite';
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
+import vue from '@vitejs/plugin-vue';
 // import vueDevTools from "vite-plugin-vue-devtools";
 
 export default defineConfig(({ mode }) => {
@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => {
     ],
     resolve: {
       alias: {
-        "@": fileURLToPath(new URL("./src", import.meta.url)),
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
     server: {
@@ -41,12 +41,12 @@ export default defineConfig(({ mode }) => {
           configure: (proxy, options) => {
             // 配置此项可在响应头中看到请求的真实地址
             proxy.on('proxyRes', (proxyRes, req) => {
-              proxyRes.headers['x-real-url'] = new URL(req.url || '', options.target?.toString())?.href || ''
-            })
+              proxyRes.headers['x-real-url'] =
+                new URL(req.url || '', options.target?.toString())?.href || '';
+            });
           },
         },
       },
     },
-  }
-}
-);
+  };
+});

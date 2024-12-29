@@ -1,6 +1,6 @@
-import type { UploadUserFile } from "element-plus";
+import type { UploadFile, UploadUserFile } from 'element-plus';
 
-export interface infoForm {
+export interface InfoForm {
   name: string;
   region: string;
   delivery: boolean;
@@ -8,4 +8,15 @@ export interface infoForm {
   resource: string;
   desc: string;
   fileList: UploadUserFile[];
+}
+
+export interface DialogProps {
+  visible: boolean;
+  title?: string;
+  width?: string;
+}
+
+export interface FileUploadProps {
+  defaultFileList?: UploadFile[];
+  disabled?: boolean;
 }
